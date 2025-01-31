@@ -5,8 +5,9 @@ import {
 } from '@testing-library/react';
 import ProductList from '../../src/components/ProductList';
 import { server } from '../mocks/server';
-import { delay, http, HttpResponse } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { db } from '../mocks/db';
+import { simulateAPIDelay } from '../utils';
 
 describe('ProductList', () => {
   const productIds: number[] = [];
@@ -51,11 +52,7 @@ describe('ProductList', () => {
   });
 
   it('should render a loading message while the request is pending', async () => {
-    server.use(
-      http.get('/products', () => {
-        delay('infinite');
-      })
-    );
+    simulateAPIDelay('/products');
 
     render(<ProductList />);
 
@@ -67,9 +64,7 @@ describe('ProductList', () => {
   it('should remove the loading message after the request is resolved', async () => {
     render(<ProductList />);
 
-    const message = await screen.findByText(/loading/i);
-
-    waitForElementToBeRemoved(message);
+    await waitForElementToBeRemoved(() => screen.queryByText(/loading/i));
   });
 
   it('should remove the loading message after the request fails', async () => {
@@ -77,8 +72,6 @@ describe('ProductList', () => {
 
     render(<ProductList />);
 
-    const message = await screen.findByText(/loading/i);
-
-    waitForElementToBeRemoved(message);
+    await waitForElementToBeRemoved(() => screen.queryByText(/loading/i));
   });
 });
