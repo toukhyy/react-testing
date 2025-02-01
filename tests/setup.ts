@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import ResizeObserver from 'resize-observer-polyfill';
 import { server } from './mocks/server';
+import { auth0Factory } from './mocks/auth0';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
@@ -24,4 +25,9 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
+});
+
+// Mocked Modules
+vi.mock('@auth0/auth0-react', () => {
+  return auth0Factory;
 });
